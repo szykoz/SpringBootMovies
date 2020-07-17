@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>movies</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script type="text/javascript">
+
+			// get all movies
+			$.get('http://127.0.0.1:8080/api/movies', {}, function (data, textStatus, jqXHR) {
+			    console.log('data: ', data);
+    			var html = '';
+        		$.each(data, function(key, value) {
+
+        	    	html += '<div class="card">';
+  					html += '<img src="' + (isImage(value.image) ? value.image : getPlaceholder()) + '" alt="movie" style="width:100%">';
+  					html += '<h3>' + value.title + '</h3>';
+  					html += '<p class="title">Rok produkcji</p>';
+  					html += '<p>' + (value.year === undefined ? "????" : value.year) + '</p>';
+					html += '<p><button onclick="deleteMovie('+value.movieId+')">ID: ' + value.movieId + '</button></p>';
+					html += '</div>';
+        		});
+
+        		$('#movies').html(html);
+			}).fail(function() {
+		    	$('#movies').html("<div style='text-align: center; color: red;'>Mam problem z wyświetleniem danych... :/ (musisz uruchomić aplikacje za pomocą MAVEN)</div>");
+			});
+
+			// count movies
+            $.get('http://127.0.0.1:8080/api/movies/counter', {}, function (data, textStatus, jqXHR) {
+                console.log('movies counter data: ', data);
+                $('#movies-counter').html("Licznik filmów: <b style='color: #000;'>" + data.counter + "</b>");
+            }).fail(function() {
+                $('#movies-counter').html("Licznik filmów: <b style='color: #800;'>ERROR :(</b>");
+            });
+
+			function deleteMovie(movieId) {
+            	$.ajax({
+                	url: `http://127.0.0.1:8080/api/movies/${movieId}`,
+                	type: 'delete',
+                	contentType: 'application/json',
+                	success: function () {
+                    	console.log('Movie deleted: ', movieId);
+                    	location.reload();
+                	},
+                	error: function() {
+                    	$('#target').html("<b style='color: red;'>Coś poszło nie tak... Nie można usunąć filmu</b>");
+                    	console.log('movieId: ', movieId);
+                	}
+            	});
+        	}
+
+			function isImage(url) {
+            	return url.indexOf(".jpg") !== -1 || url.indexOf(".png") !== -1;
+			}
+
+			function getPlaceholder() {
+		    	return 'https://www-morganscloud-com.exactdn.com/wp-content/ewww/lazy/placeholder-250x356.png';
+			}
+
+			function exportMoviesToFile(fileType) {
+                $.get('http://127.0.0.1:8080/api/download-' + fileType, {}, function (data, textStatus, jqXHR) {
+                }).fail(function() {
+                    alert("Błąd!!!");
+                });
+			}
+
+        	$(document).ready(function() {
+            	$('#add-movie').click(function() {
+                	window.location.href='add-movie.html';
+            	})
+        	});
+		</script>
+
+		<style type="text/css">
+			.btn {
+				position: relative;
+				display: inline-block;
+				padding: 0.25em 0.5em;
+				text-decoration: none;
+				color: #FFF;
+				background: #fd9535;
+				border-bottom: solid 2px #d27d00;
+				border-radius: 4px;
+				box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 2px 2px rgba(0, 0, 0, 0.19);
+				font-weight: bold;
+			}
+
+			.btn:active {
+				border-bottom: solid 2px #fd9535;
+				box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
+			}
+
+			.card {
+      			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      			width: 250px;
+      			margin: 20px;
+      			text-align: center;
+      			display: inline-block;
+    		}
+
+    		.title {
+      			color: grey;
+      			font-size: 18px;
+    		}
+
+    		button, a {
+      			border: none;
+      			outline: 0;
+      			display: inline-block;
+      			padding: 8px;
+      			color: white;
+      			background-color: #000;
+      			text-align: center;
+      			cursor: pointer;
+      			width: 100%;
+      			font-size: 18px;
+    		}
+
+    		button:hover, a:hover {
+      			opacity: 0.7;
+    		}
+
+    		h1 {
+      			margin: 10px auto;
+      			text-align: center;
+    		}
+
+			div.movies-counter {
+				position: fixed;
+				top: 0;
+				left: 0;
+				padding: 5px;
+				text-decoration: none;
+				color: #FFF;
+				background: #fd9535;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1>Biblioteka filmów</h1>
+		<div id="movies-counter" class="movies-counter" style="z-index: 1"></div>
+		<div style="text-align: right; margin-bottom: 2px;">
+			<button style="width: 150px;" class="btn" id="add-movie">+ Dodaj</button>
+		</div>
+		<div style="text-align: center">
+			<a style="width: 150px;" class="btn" href="http://127.0.0.1:8080/api/download-txt">-> Export TXT</a>
+		</div>
+    	<div id="movies"></div>
+	</body>
+</html>

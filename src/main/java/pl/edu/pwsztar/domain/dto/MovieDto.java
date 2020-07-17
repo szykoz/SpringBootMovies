@@ -11,6 +11,13 @@ public class MovieDto implements Serializable {
     public MovieDto() {
     }
 
+    private MovieDto(Builder builder) {
+        this.movieId = builder.movieId;
+        this.title = builder.title;
+        this.image = builder.image;
+        this.year = builder.year;
+    }
+
     public Long getMovieId() {
         return movieId;
     }
@@ -23,28 +30,42 @@ public class MovieDto implements Serializable {
         return image;
     }
 
-    public void setMovieId(Long movieId) {
-        this.movieId = movieId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public Integer getYear() {
         return year;
     }
 
-    @Override
-    public String toString() {
-        return year+" "+title;
-    }
 
-    public void setYear(Integer year) {
-        this.year = year;
+    public static final class Builder {
+        private Long movieId;
+        private String title;
+        private String image;
+        private Integer year;
+
+        public Builder() {
+        }
+
+        public Builder movieId(Long movieId) {
+            this.movieId = movieId;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder image(String image) {
+            this.image = image;
+            return this;
+        }
+
+        public Builder year(Integer year) {
+            this.year = year;
+            return this;
+        }
+
+        public MovieDto build() {
+            return new MovieDto(this);
+        }
     }
 }

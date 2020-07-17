@@ -16,6 +16,5 @@ public class MovieMapper implements Converter<CreateMovieDto, Movie> {
                 .title(createMovieDto.getTitle())
                 .year(createMovieDto.getYear())
                 .build();
-
     }
 }

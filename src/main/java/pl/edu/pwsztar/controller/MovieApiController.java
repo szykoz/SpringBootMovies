@@ -16,7 +16,7 @@ import pl.edu.pwsztar.service.MovieService;
 import java.util.List;
 
 @Controller
-@RequestMapping(value="/api")
+@RequestMapping(value = "/api")
 public class MovieApiController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieApiController.class);
@@ -61,6 +61,14 @@ public class MovieApiController {
         LOGGER.info("count movies");
 
         return new ResponseEntity<>(movieService.countMovies(), HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/movies/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<MovieDto>> searchMovies(@RequestParam("query") String query) {
+        LOGGER.info("search movies");
+
+        return new ResponseEntity<>(movieService.searchMovies(query), HttpStatus.OK);
     }
 
 }

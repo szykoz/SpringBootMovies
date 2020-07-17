@@ -24,11 +24,11 @@ public class Movie implements Serializable {
     public Movie() {
     }
 
-    public Movie(Builder builder) {
-        movieId = builder.movieId;
-        title = builder.title;
-        image = builder.image;
-        year = builder.year;
+    private Movie(Builder builder) {
+        this.movieId = builder.movieId;
+        this.title = builder.title;
+        this.image = builder.image;
+        this.year = builder.year;
     }
 
     public Long getMovieId() {
@@ -53,7 +53,8 @@ public class Movie implements Serializable {
         private String image;
         private Integer year;
 
-        public Builder(){}
+        public Builder() {
+        }
 
         public Builder movieId(Long movieId) {
             this.movieId = movieId;

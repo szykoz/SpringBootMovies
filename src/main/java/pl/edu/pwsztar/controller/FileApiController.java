@@ -12,12 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import pl.edu.pwsztar.service.FileService;
+import pl.edu.pwsztar.domain.converter.Converter;
+import pl.edu.pwsztar.domain.dto.FileDto;
+import pl.edu.pwsztar.domain.dto.MovieDto;
+import pl.edu.pwsztar.domain.files.FileGenerator;
 import pl.edu.pwsztar.service.MovieService;
 
-import java.io.*;
-import java.util.Date;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping(value="/api")
@@ -25,11 +27,17 @@ public class FileApiController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieApiController.class);
 
-    private final FileService fileService;
+    private MovieService movieService;
+    private Converter<List<MovieDto>, FileDto> fileMapper;
+    private FileGenerator fileGenerator;
 
     @Autowired
-    public FileApiController(FileService fileService) {
-        this.fileService = fileService;
+    public FileApiController(MovieService movieService,
+                             Converter<List<MovieDto>, FileDto> fileMapper,
+                             FileGenerator fileGenerator) {
+        this.movieService = movieService;
+        this.fileMapper = fileMapper;
+        this.fileGenerator = fileGenerator;
     }
 
     @CrossOrigin
@@ -37,14 +45,16 @@ public class FileApiController {
     public ResponseEntity<Resource> downloadTxt() throws IOException {
         LOGGER.info("--- download txt file ---");
 
-        File file = fileService.createFile();
-        InputStreamResource inputStreamResource = fileService.downloadFile(file);
+        List<MovieDto> movies = movieService.findAllByYearDesc();
+        FileDto fileDto = fileMapper.convert(movies);
+        InputStreamResource inputStreamResource = fileGenerator.toTxt(fileDto);
+
+        final MediaType mediaType = MediaType.parseMediaType("application/octet-stream");
+        final String headerAttachmentParam = "attachment;filename=" + fileDto.getFullName();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "test_"+(new Date().getTime())+".txt")
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerAttachmentParam)
+                .contentType(mediaType)
                 .body(inputStreamResource);
-
     }
 }

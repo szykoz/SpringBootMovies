@@ -9,7 +9,11 @@ public class MovieCounterDto implements Serializable {
         counter = 0L;
     }
 
-    public MovieCounterDto(Builder builder) {
+    public MovieCounterDto(Long counter) {
+        this.counter = counter;
+    }
+
+    private MovieCounterDto(Builder builder) {
         counter = builder.counter;
     }
 
@@ -20,9 +24,10 @@ public class MovieCounterDto implements Serializable {
     public static final class Builder {
         private Long counter;
 
-        public Builder() {}
+        public Builder() {
+        }
 
-        public Builder counter (Long counter) {
+        public Builder counter(Long counter) {
             this.counter = counter;
             return this;
         }
@@ -30,6 +35,5 @@ public class MovieCounterDto implements Serializable {
         public MovieCounterDto build() {
             return new MovieCounterDto(this);
         }
-
     }
 }
